@@ -1,0 +1,965 @@
+/* ==========================================================================
+   Glastonbury Community Site — stylesheet
+   Built strictly from design/system.md §3, §4, §5, §7 and
+   design/color-palette.md §1–§4. No new color, type or spacing tokens.
+   v1 is LIGHT-ONLY by design (color-palette.md §4): the audited light
+   palette is the contractual set, so no prefers-color-scheme block here.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* Brand (color-palette.md §1) */
+  --c-primary:        #0F3D57;  /* River Deep */
+  --c-primary-hover:  #0A2C41;
+  --c-accent:         #A3402E;  /* Mill Red  */
+  --c-secondary:      #2F6B4F;  /* Hubbard Sage */
+
+  /* Surfaces */
+  --c-surface:        #F7F3EC;  /* Welles Cream — page */
+  --c-card:           #FFFFFF;  /* Paper */
+  --c-tint:           #E8EFF3;
+
+  /* Text */
+  --c-text:           #1B1F23;  /* Ink */
+  --c-text-muted:     #4A5560;  /* Slate */
+  --c-text-on-dark:   #F7F3EC;
+
+  /* Lines & focus */
+  --c-border:         #DBD3C7;  /* Rule */
+  --c-focus:          #0F3D57;
+  --c-focus-dark:     #F7F3EC;
+
+  /* Typefaces (system.md §3.1) */
+  --font-display: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-body:    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+                  "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale (system.md §3.2) */
+  --fs-display: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  --fs-h1:      clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  --fs-h2:      clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
+  --fs-h3:      1.125rem;
+  --fs-body:    1.0625rem;   /* 17px — system.md §3.2 */
+  --fs-small:   0.9375rem;
+  --fs-meta:    0.8125rem;
+  --fs-tag:     0.75rem;
+
+  /* Spacing, radius, depth (system.md §5.1) */
+  --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;    --space-5: 1.5rem;  --space-6: 2rem;
+  --space-7: 3rem;    --space-8: 4rem;    --space-9: 6rem;
+
+  --radius-sm: 4px;   --radius-md: 8px;    --radius-lg: 14px;  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(27,31,35,.06), 0 1px 3px rgba(27,31,35,.08);
+  --shadow-2: 0 6px 16px rgba(15,61,87,.10);
+
+  --container: 72rem;   /* 1152px */
+  --gutter: clamp(1rem, 4vw, 2rem);
+
+  --measure: 68ch;      /* prose measure (system.md §3.3) */
+  --measure-card: 42ch; /* card description measure */
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+img, svg { max-width: 100%; height: auto; }
+
+/* Headings — River Deep, serif display (system.md §3.3) */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--c-primary);
+  margin: 0 0 var(--space-3);
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-4);
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+p { margin: 0 0 var(--space-4); }
+
+/* Body links: River Deep AND underlined — never color alone (§3.3, palette §3.3) */
+a {
+  color: var(--c-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--c-primary-hover);
+  background-color: var(--c-tint);
+}
+
+/* Focus: 3px River Deep outline, 2px offset, on EVERY focusable element.
+   system.md §4.3 + §7 — outline must never be removed. */
+:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Dark surfaces re-tint the ring (palette §3.4, system.md §5.10) */
+.site-header :focus-visible,
+.site-footer :focus-visible {
+  outline-color: var(--c-focus-dark);
+}
+
+/* Numbers in addresses/dates/stats sit on a stable baseline (§3.3) */
+.tabular, address, .biz-address, .fact-table td, .event-cadence, .stat-figure {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   3. Utilities — skip link, visually-hidden, container, measures
+   -------------------------------------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — first focusable element on every page (system.md §4.5) */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--space-4);
+  z-index: 100;
+  transform: translateY(-150%);
+  display: inline-block;
+  padding: var(--space-3) var(--space-5);
+  background: var(--c-primary);
+  color: var(--c-text-on-dark);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-pill) var(--radius-pill);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  color: var(--c-text-on-dark);
+  background: var(--c-primary);
+  outline: 3px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.measure { max-width: var(--measure); }
+.measure-card { max-width: var(--measure-card); }
+
+.prose > p:last-child { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+   4. Site header + navigation (system.md §4)
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--c-primary);
+  color: var(--c-text-on-dark);
+  border-bottom: 1px solid var(--c-primary);
+}
+
+/* Soft shadow only once the page has scrolled — no shadow at rest */
+.site-header.is-scrolled {
+  box-shadow: var(--shadow-2);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding-block: var(--space-3);
+}
+
+/* Wordmark is the home link and the sole header element top-left (§4.1) */
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--c-text-on-dark);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding-block: var(--space-1);
+}
+
+.wordmark:hover, .wordmark:focus { color: var(--c-text-on-dark); background: transparent; }
+
+.wordmark__grove { flex: 0 0 auto; color: var(--c-secondary); }
+
+/* Header actions: Town Website outbound link + mobile Menu disclosure */
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-inline-start: auto;
+}
+
+/* Outbound Town Website link — visually distinct from the 5 internal items */
+.nav-outbound {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--c-text-on-dark);
+  border-radius: var(--radius-pill);
+  color: var(--c-text-on-dark);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-outbound:hover,
+.nav-outbound:focus {
+  background: var(--c-text-on-dark);
+  color: var(--c-primary);
+}
+
+/* Mobile disclosure control — a text label, not a bare icon (§4.2).
+   It is a <details>/<summary>, so it works with JavaScript disabled. */
+.nav-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--c-text-on-dark);
+  border-radius: var(--radius-pill);
+  color: var(--c-text-on-dark);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.nav-disclosure summary::-webkit-details-marker { display: none; }
+.nav-disclosure summary::after {
+  content: "▾";
+  font-size: 0.75em;
+  line-height: 1;
+}
+.nav-disclosure[open] summary::after { content: "▴"; }
+
+.nav-disclosure summary:hover { background: rgba(247,243,236,.14); }
+
+/* The internal nav: a plain anchor list (works with JS off) */
+.primary-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.primary-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--c-text-on-dark);
+  text-decoration: none;
+  font-size: var(--fs-small);
+  border-bottom: 2px solid transparent;
+}
+
+.primary-nav a:hover,
+.primary-nav a:focus {
+  color: var(--c-text-on-dark);
+  background: rgba(247,243,236,.14);
+  text-decoration: underline;
+}
+
+/* Current page marked THREE ways: bar + weight + aria-current (§4.3) */
+.primary-nav a[aria-current="page"] {
+  border-bottom-color: var(--c-accent);
+  font-weight: 600;
+  color: var(--c-text-on-dark);
+}
+
+/* ---- Mobile layout: five internal items collapse beneath "Menu" ------- */
+@media (max-width: 767px) {
+  .nav-disclosure { display: block; flex-basis: 100%; }
+  .nav-disclosure summary { justify-content: space-between; width: 100%; }
+
+  .nav-disclosure .primary-nav { padding-top: var(--space-2); }
+  .primary-nav ul { flex-direction: column; align-items: stretch; }
+  .primary-nav a { width: 100%; border-bottom: 1px solid rgba(247,243,236,.25); }
+  .primary-nav a[aria-current="page"] { border-bottom-color: var(--c-accent); }
+
+  /* Without JS the disclosure is forced open by the .no-js class on <html> */
+  .no-js .nav-disclosure { display: block; }
+}
+
+/* ---- Desktop: all five items inline, no disclosure (§4.1) ------------- */
+@media (min-width: 768px) {
+  .nav-disclosure { display: contents; }
+  .nav-disclosure summary { display: none; }
+  .nav-disclosure .primary-nav { flex-basis: auto; }
+}
+
+/* --------------------------------------------------------------------------
+   5. Layout blocks (system.md §5)
+   -------------------------------------------------------------------------- */
+main { display: block; }
+
+.section {
+  padding-block: var(--space-8);
+}
+
+.section + .section { border-top: 1px solid var(--c-border); }
+
+.section--tinted { background: var(--c-card); }
+
+/* §5.8 Section header: H2 → optional dek (max 60ch) → optional action */
+.section-header { margin-bottom: var(--space-6); }
+.section-header h2 { margin-bottom: var(--space-2); }
+
+.dek {
+  color: var(--c-text-muted);
+  max-width: 60ch;
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+/* One sanctioned decorative device (§6): a ≤4px Sage→River "river" band */
+.river-rule {
+  height: 4px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(90deg, var(--c-secondary) 0%, var(--c-primary) 100%);
+}
+
+/* ---- Page hero -------------------------------------------------------- */
+.page-hero {
+  padding-block: var(--space-7) var(--space-6);
+  background: var(--c-surface);
+}
+
+.page-hero .dek { font-size: var(--fs-body); color: var(--c-text-muted); }
+
+/* Home hero: wordmark-level display type (§3.2 --fs-display) */
+.home-hero { padding-block: var(--space-8) var(--space-6); }
+
+.home-hero__wordmark {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--c-primary);
+  margin: 0 0 var(--space-4);
+}
+
+.lead {
+  font-size: var(--fs-h3);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--c-text);
+  max-width: var(--measure);
+}
+
+/* Citation slot reserved at --fs-meta (§5.3, content draft editor rule 4) */
+.citation {
+  font-size: var(--fs-meta);
+  line-height: 1.45;
+  color: var(--c-text-muted);
+  margin: 0;
+  max-width: var(--measure);
+}
+
+.citation a { color: var(--c-primary); }
+
+/* ---- §5.3 Reading block ---------------------------------------------- */
+.reading { max-width: var(--measure); }
+.reading h3 { margin-top: var(--space-6); }
+.reading h3:first-of-type { margin-top: 0; }
+.reading > p:last-child { margin-bottom: 0; }
+
+/* Census stat treatment: tabular numerals, River Deep, larger (§5.3) */
+.stat-figure {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--c-primary);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.stat-caption { color: var(--c-text-muted); font-size: var(--fs-small); margin: 0 0 var(--space-4); }
+
+/* ---- §5.4 Numbered feature list -------------------------------------- */
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.feature {
+  position: relative;
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  padding-inline-start: calc(var(--space-5) + 44px);
+}
+
+/* The ordinal is an element, not typed text (§3.3) */
+.feature__ordinal {
+  position: absolute;
+  inset-inline-start: var(--space-5);
+  inset-block-start: var(--space-5);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--c-primary);
+  color: var(--c-text-on-dark);
+  font-family: var(--font-body);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.feature h3 { margin-bottom: var(--space-2); }
+
+.feature p {
+  color: var(--c-text-muted);
+  font-size: var(--fs-small);
+  max-width: var(--measure-card);
+  margin-bottom: var(--space-3);
+}
+
+.feature__source {
+  font-size: var(--fs-meta);
+  color: var(--c-text-muted);
+  margin: 0;
+}
+
+/* ---- §5.5 Business directory ----------------------------------------- */
+/* The directory is a definition list: the business name is the term (<dt>)
+   and its address + website are the description (<dd>). This is the
+   "definition-list fallback / print-friendly form" §5.5 specifies, used here
+   as the primary markup so the four entries — one per category — read as a
+   clean single-column list rather than four near-empty category headings. */
+.biz-directory {
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .biz-directory { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.biz-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  margin: 0;
+}
+
+.biz-card dt { margin: 0; }
+
+/* Category tag: uppercase --fs-tag, Sage on Tint, pill. Displayed on the
+   card itself rather than as a standalone category heading — the enclosing
+   H2 is already "Business Directory" (§5.5), so a second heading level is
+   not needed and would double-label each entry. */
+.biz-cat {
+  display: block;
+  font-size: var(--fs-tag);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.biz-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--c-primary);
+  margin-bottom: var(--space-2);
+}
+
+.biz-card dd { margin: 0; }
+
+/* Category tag: uppercase --fs-tag, Sage on Tint, pill.
+   Kept for any future multi-item category grouping; the current one-per-
+   category directory carries its category inline as .biz-cat instead (§5.5). */
+.tag {
+  display: inline-block;
+  font-size: var(--fs-tag);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-3);
+}
+
+.tag--category { background: var(--c-tint); color: var(--c-secondary); }
+
+/* Recurring-event flag — Mill Red pill (§5.7), a sanctioned accent use */
+.tag--recurring { background: var(--c-accent); color: var(--c-text-on-dark); }
+
+.biz-address {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  line-height: 1.45;
+  color: var(--c-text-muted);
+  font-style: normal;
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+.biz-site { font-size: var(--fs-small); margin: 0; }
+
+/* "No website listed" — a designed absence: Slate italic, no link styling,
+   no empty anchor, no dead icon (§5.5). */
+.biz-nonweb {
+  font-size: var(--fs-meta);
+  font-style: italic;
+  color: var(--c-text-muted);
+  margin: 0;
+}
+
+/* ---- §5.9 Data table (quick facts) ----------------------------------- */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-small);
+}
+
+.fact-table caption {
+  caption-side: top;
+  text-align: start;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  color: var(--c-primary);
+  padding-bottom: var(--space-3);
+}
+
+.fact-table th,
+.fact-table td {
+  text-align: start;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: top;
+}
+
+.fact-table thead th {
+  background: var(--c-primary);
+  color: var(--c-text-on-dark);
+  font-weight: 600;
+}
+
+.fact-table tbody tr:nth-child(even) { background: rgba(232,239,243,.5); }
+.fact-table tr:last-child th,
+.fact-table tr:last-child td { border-bottom: 0; }
+
+/* Below 640px a civic table must not shrink — it becomes stacked cards.
+   Labels are carried by the data-label attributes on each cell. */
+@media (max-width: 639px) {
+  .fact-table,
+  .fact-table thead,
+  .fact-table tbody,
+  .fact-table tr,
+  .fact-table th,
+  .fact-table td { display: block; width: 100%; }
+
+  .fact-table caption { padding-bottom: var(--space-2); }
+
+  .fact-table thead {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .fact-table tr {
+    border-bottom: 1px solid var(--c-border);
+    padding-block: var(--space-3);
+  }
+
+  .fact-table tr:last-child { border-bottom: 0; }
+
+  .fact-table tbody tr:nth-child(even) { background: transparent; }
+
+  .fact-table td {
+    border-bottom: 0;
+    padding: var(--space-1) 0;
+  }
+
+  .fact-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: var(--c-text-muted);
+    font-size: var(--fs-meta);
+  }
+}
+
+/* ---- §5.6 Service / outbound link card -------------------------------- */
+.card-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.service-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-inline-start: 3px solid var(--c-secondary); /* civic marker */
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+}
+
+.service-card h3 { margin-bottom: var(--space-2); }
+
+.service-card p {
+  color: var(--c-text-muted);
+  font-size: var(--fs-small);
+  max-width: var(--measure-card);
+  margin-bottom: var(--space-4);
+}
+
+/* The destination is shown as text — never hidden behind "click here" (§5.6) */
+.service-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.service-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;                 /* 44px minimum hit area (§5.6) */
+  font-size: var(--fs-small);
+  overflow-wrap: anywhere;
+}
+
+/* ---- §5.7 Event item -------------------------------------------------- */
+.event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .event-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.event-item {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+}
+
+.event-item h3 { margin-bottom: var(--space-2); }
+
+.event-cadence {
+  font-size: var(--fs-meta);
+  color: var(--c-text-muted);
+  margin: 0 0 var(--space-3);
+}
+
+.event-item p {
+  color: var(--c-text-muted);
+  font-size: var(--fs-small);
+  max-width: var(--measure-card);
+  margin-bottom: var(--space-3);
+}
+
+.event-item .tag--recurring { margin-bottom: var(--space-3); }
+
+/* Empty / muted state for the events block (§5.7) — never a blank region */
+.panel {
+  background: var(--c-tint);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  max-width: var(--measure);
+}
+
+.panel p:last-child { margin-bottom: 0; }
+
+/* Visible sample-content notice — deliberately NOT sr-only (§5.7, draft §9.4) */
+.notice {
+  background: var(--c-tint);
+  border: 1px solid var(--c-border);
+  border-inline-start: 3px solid var(--c-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-6);
+  max-width: var(--measure);
+}
+
+.notice p { margin: 0; font-size: var(--fs-small); }
+.notice p + p { margin-top: var(--space-2); }
+
+/* ---- Home cards (text-led, icon-free, per draft §1.2) ----------------- */
+.home-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.home-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.home-card h2,
+.home-card h3 { font-size: var(--fs-h3); font-weight: 600; }
+
+.home-card p {
+  color: var(--c-text-muted);
+  font-size: var(--fs-small);
+  max-width: var(--measure-card);
+  flex: 1 1 auto;
+}
+
+.home-card .arrow-link { margin-top: auto; font-weight: 600; font-size: var(--fs-small); }
+
+/* ---- CTA band -------------------------------------------------------- */
+.cta {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-6) var(--space-5);
+  max-width: var(--measure);
+}
+
+.cta h2, .cta h3 { font-size: var(--fs-h3); font-weight: 600; }
+.cta p { color: var(--c-text-muted); font-size: var(--fs-small); }
+.cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- Small print / quiet lists --------------------------------------- */
+.small-print {
+  font-size: var(--fs-small);
+  color: var(--c-text-muted);
+  max-width: var(--measure);
+}
+
+.small-print a { color: var(--c-primary); }
+
+/* A heading that introduces quiet small-print copy below a section header */
+.small-print-heading { margin-top: var(--space-6); }
+
+.link-row {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.link-row a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--fs-small);
+  overflow-wrap: anywhere;
+}
+
+/* Address block on Contact */
+.contact-block {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  max-width: var(--measure);
+}
+
+.contact-block address {
+  font-style: normal;
+  white-space: pre-line;
+  margin-bottom: var(--space-4);
+}
+
+/* The ↗ marker is decorative; the new-tab announcement is sr-only (draft §9.4) */
+.ext-mark {
+  display: inline-block;
+  font-size: 0.9em;
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   6. Footer (system.md §5.10)
+   -------------------------------------------------------------------------- */
+.site-footer {
+  background: var(--c-primary);
+  color: var(--c-text-on-dark);
+  margin-top: var(--space-9);
+  padding-block: var(--space-7) var(--space-6);
+  font-size: var(--fs-small);
+}
+
+.site-footer__regions {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .site-footer__regions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.site-footer h2 {
+  font-family: var(--font-body);
+  font-size: var(--fs-tag);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-tint);
+  margin-bottom: var(--space-3);
+}
+
+.site-footer p { margin: 0 0 var(--space-3); max-width: 44ch; }
+.site-footer p:last-child { margin-bottom: 0; }
+
+.site-footer a { color: var(--c-card); }
+.site-footer a:hover { color: var(--c-primary); background: var(--c-tint); }
+
+.site-footer__muted { color: var(--c-tint); }
+
+.site-footer__bottom {
+  border-top: 1px solid rgba(247,243,236,.28);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+}
+
+.site-footer__bottom p { max-width: none; }
+
+/* --------------------------------------------------------------------------
+   7. Motion (system.md §7) — all transitions ≤200ms and reduced-motion aware
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Print
+   -------------------------------------------------------------------------- */
+@media print {
+  .site-header, .skip-link, .cta__actions { display: none; }
+  body { background: #fff; }
+  .site-footer { background: #fff; color: var(--c-text); }
+  .site-footer a { color: var(--c-primary); }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}
